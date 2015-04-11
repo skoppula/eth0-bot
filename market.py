@@ -45,7 +45,8 @@ class Market:
                     self.state = CLOSED
 
     def get_next_id(self):
-        return ++self.next_id
+        self.next_id = self.next_id + 1
+        return self.next_id
 
     def __send_order(self, direction, symbol, price, size):
         order_id = self.get_next_id()
@@ -118,4 +119,4 @@ class Market:
         elif msg.type == 'out':
             del self.orders[msg['order_id']]
 
-        print market
+        print self
