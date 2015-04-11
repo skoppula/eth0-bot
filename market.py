@@ -7,7 +7,6 @@ CLOSED = 'CLOSED'
 
 PENDING = 'PENDING'
 ACK = 'ACK'
-REJECTED = 'REJECT'
 PARTIALLY_FILLED = 'PARTIALLY_FILLED'
 
 BUY = 'BUY'
@@ -123,15 +122,13 @@ class Market:
             })
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
-        elif msg['type'] == 'reject':
-            self.orders[msg['order_id']]['state'] = REJECTED
         elif msg['type'] == 'fill':
             self.orders[msg['order_id']]['state'] = PARTIALLY_FILLED
             self.orders[msg['order_id']]['size'] = \
                 self.orders[msg['order_id']]['size'] - msg['size']
             sign = 1 if msg['dir'] == BUY else -1
             self.stocks[msg['symbol']]['position'] += msg['size'] * sign
-        elif msg['type'] == 'out':
+        elif msg['type'] == 'out' or msg['type'] == 'reject':
             del self.orders[msg['order_id']]
 
         #print self
