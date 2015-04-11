@@ -96,26 +96,26 @@ class Market:
 
     def update(self):
         msg = util.get_message(self.socket)
-        if msg.type == 'book':
+        if msg['type'] == 'book':
             self.stocks[msg['symbol']]['book_buy'] = msg['buy']
             self.stocks[msg['symbol']]['book_sell'] = msg['sell']
 
             self.stocks[msg['symbol']]['bid'] = reduce(lambda bid, x: max(bid, x[0]), msg['buy'], 0)
             self.stocks[msg['symbol']]['ask'] = reduce(lambda ask, x: max(ask, x[0]), msg['sell'], 0)
-        elif msg.type == 'trade':
+        elif msg['type'] == 'trade':
             self.trades[msg['symbol']].append({
                 'price': msg['price'],
                 'size': msg['size']
             })
-        elif msg.type == 'ack':
+        elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
-        elif msg.type == 'reject':
+        elif msg['type'] == 'reject':
             self.orders[msg['order_id']]['state'] = REJECTED
-        elif msg.type == 'fill':
+        elif msg['type'] == 'fill':
             self.orders[msg['order_id']]['state'] = PARTIALLY_FILLED
             self.orders[msg['order_id']]['size'] = \
                 self.orders[msg['order_id']]['size'] - msg['size']
-        elif msg.type == 'out':
+        elif msg['type'] == 'out':
             del self.orders[msg['order_id']]
 
-        print market
+        print self

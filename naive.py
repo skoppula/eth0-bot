@@ -8,17 +8,16 @@ def fair_value(stock):
     best_offer = stock['ask']
     return best_bid + .5*(best_offer-best_bid)
     
-def penny(stock, info):
+def penny(market, stock, info):
     penny_buy = info['bid']+1
     penny_sell = info['ask']-1
     if (penny_buy - penny_sell) > 0:
-        market.send_order("BUY", stock, penny_buy, 1)
-        market.send_order("SELL", stock, penny_stock, 1)
+        market.buy_order(stock, penny_buy, 1)
+        market.sell_order(stock, penny_sell, 1)
         return
     else:
         return
    
-    
 def ETF_strategy(stocks):
     # Calculate the best buys and sells for a stock
     if stock == "CORGE":
@@ -32,7 +31,7 @@ def ETF_strategy(stocks):
 def next_action(market):
     # takes in a market, computes a fair value, outputs some action based on strategy   
     for stock, info in market.stocks.items():
-        penny(stock, info)
+        penny(market, stock, info)
         
         
         
