@@ -52,13 +52,19 @@ def penny(market, stock, info):
     else:
         return
    
-def ETF_strategy(stocks):
+def ETF_strategy(m):
     # Calculate the best buys and sells for a stock
-    if stock == "CORGE":
-        sell_profit = stocks["CORGE"]['ask']*10 - stocks["FOO"]['bid']*3 - stocks["BAR"]['bid']*8
-        buy_profit = stocks["FOO"]['bid']*3 + stocks["BAR"]['bid']*8 - stocks["CORGE"]['ask']*10
-    else:
-        return -1
+    sell_margin = m.stocks["CORGE"]['ask']*10 - m.stocks["FOO"]['bid']*3 - m.stocks["BAR"]['bid']*8
+
+    buy_margin = m.stocks["FOO"]['bid']*3 + m.stocks["BAR"]['bid']*8 - m.stocks["CORGE"]['ask']*10
+    if buy_margin > 100:
+        # Convert CORGE to FOO/BAR and sell at bid price
+        num_corge = m.stocks["CORGE"]['position']
+        max_convert = 10*(math.floor(num_corge/10.0))
+        m.convert_sell_order("CORGE", max_convert)
+        m.sell_order("FOO", m.stocks["FOO"]['bid'], .3*max_convert)
+        m.sell_order("BAR", m.stocks["BAR"]['bid'], .8*max_convert)
+    return
 
 def order_timeout(orders):
     current_time = time.time()
