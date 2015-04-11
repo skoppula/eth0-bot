@@ -14,8 +14,8 @@ def halfway_value(market, stock, info):
 def median_average(market, stock, info):
     temp_bid = [bids['price'] for bids in info['book_buy']]
     temp_offer = [offers['price'] for offers in info['book_sell']]
-    median_bid = statistics.median(temp_bid)
-    median_offer = statistics.median(temp_offer)
+    median_bid = statistics.median(temp_bid) if len(temp_bid) != 0 else 0
+    median_offer = statistics.median(temp_offer) if len(temp_offer) != 0 else 0
     return .5*(median_bid + median_offer)
 
 def FV_attempt(market, stock, info):
