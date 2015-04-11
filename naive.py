@@ -77,12 +77,12 @@ def order_timeout(m):
             num_orders = max(0, num_orders - 1)
 
 # USE THIS FUNCTION:
-def next_action(market):
+def next_action(m):
     # takes in a market, computes a fair value, outputs some action based on strategy
-    order_timeout(market)
+    order_timeout(m)
 
-    for stock, info in sorted(market.stocks.items(), key=lambda x: random.random()):
-        if num_orders < MAX_NUM_ORDERS:
-            did_action = FV_attempt(market, stock, info)
+    for stock, info in sorted(m.stocks.items(), key=lambda x: random.random()):
+        if m.num_orders < MAX_NUM_ORDERS:
+            did_action = FV_attempt(m, stock, info)
             if not did_action:
-                penny(market, stock, info)
+                penny(m, stock, info)
