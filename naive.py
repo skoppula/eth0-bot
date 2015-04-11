@@ -6,8 +6,8 @@ import random
 # Given a market state, output a fair value,
 
 PENNY_SIZE = 10
-TURNOVER = 1 #1 second turnover rate
-MAX_NUM_ORDERS = 50 #50 active orders
+TURNOVER = 5 #2 second turnover rate
+MAX_NUM_ORDERS = 10 #50 active orders
 
 def halfway_value(market, stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
@@ -72,7 +72,7 @@ def order_timeout(m):
     current_time = time.time()
     orders = m.orders
     for order, order_info in orders.items():
-        if current_time - order_info['timestamp'] > TURNOVER:
+        if order_info['state'] != market.CANCELLING and current_time - order_info['timestamp'] > TURNOVER:
             m.cancel_order(order)
 
 # USE THIS FUNCTION:
