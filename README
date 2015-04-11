@@ -1,4 +1,5 @@
 -prod and dev branch
 -ETFs
+-negative position
 -Testing: number of active orders, timeout threshold, how many penny at a time
 -Seperate log files
