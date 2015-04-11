@@ -133,7 +133,13 @@ class Market:
                 'size': msg['size']
             })
             self.stocks[msg['symbol']]['last_trade'] = msg['price']
-            print "PNL:" + str(self.approx_pnl()) + "\tCASH:" + str(self.cash)
+            print "PNL:" + str(self.approx_pnl()) + "\tCASH:" + str(self.cash) + \
+                "\tFOO:" + str(self.stocks['FOO']['position']) + \
+                "\tBAR:" + str(self.stocks['BAR']['position']) + \
+                "\tBAZ:" + str(self.stocks['BAZ']['position']) + \
+                "\tQUUX:" + str(self.stocks['QUUX']['position']) + \
+                "\tCORGE:" + str(self.stocks['CORGE']['position'])
+
 
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
@@ -151,4 +157,3 @@ class Market:
 
         elif msg['type'] == 'out' or msg['type'] == 'reject':
             del self.orders[msg['order_id']]
-
