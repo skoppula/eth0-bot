@@ -9,6 +9,8 @@ PENNY_SIZE = 10
 TURNOVER = 1 #1 second turnover rate
 MAX_NUM_ORDERS = 50 #50 active orders
 
+num_orders = 0
+
 def halfway_value(market, stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
     # offer > bid
@@ -30,11 +32,13 @@ def FV_attempt(market, stock, info):
         #sells are [price, size]
         if sells[0] < FV:
             market.buy_order(stock, sells[0], sells[1])
+            num_orders++
             did_action = True
     for buys in info['book_buy']:
         if buys[0] > FV:
             if info['position'] > buys[1]:
                 market.sell_order(stock, buys[0], buys[1])
+                num_orders++
                 did_action = True
     return did_action
 
@@ -47,9 +51,11 @@ def penny(market, stock, info):
     current_buy_order = max(temp) if len(temp) != 0 else 0
     if current_buy_order != info['bid']:
         market.buy_order(stock, penny_buy, PENNY_SIZE)
+        num_orders++
     # Check if we have stock
     if 1 <= info['position']:
         market.sell_order(stock, penny_sell, PENNY_SIZE)
+        num_orders++
         return
     else:
         return
@@ -74,6 +80,7 @@ def order_timeout(m):
     for order, order_info in orders.items():
         if current_time - order_info['timestamp'] > TURNOVER:
             m.cancel_order(order)
+            num_orders = max(0, num_orders - 1)
 
 # USE THIS FUNCTION:
 def next_action(market):
@@ -81,7 +88,7 @@ def next_action(market):
     order_timeout(market)
 
     for stock, info in sorted(market.stocks.items(), key=lambda x: random.random()):
-        if market.num_orders() < MAX_NUM_ORDERS:
+        if num_orders < MAX_NUM_ORDERS:
             did_action = FV_attempt(market, stock, info)
             if not did_action:
                 penny(market, stock, info)

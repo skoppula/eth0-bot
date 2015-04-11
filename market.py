@@ -102,11 +102,11 @@ class Market:
 
     def cancel_order(self, order_id):
         print 'CANCEL #' + str(order_id) + '\n'
+        self.orders[order_id]['state'] = CANCELLING
         util.send_json(self.socket, {
             'type': 'cancel',
             'order_id': order_id
         })
-        del self.orders[order_id]
 
     def num_orders(self):
         return len(self.orders)
@@ -153,8 +153,7 @@ class Market:
                 "\tBAR:" + str(self.stocks['BAR']['position']) + \
                 "\tBAZ:" + str(self.stocks['BAZ']['position']) + \
                 "\tQUUX:" + str(self.stocks['QUUX']['position']) + \
-                "\tCORGE:" + str(self.stocks['CORGE']['position']) + \
-                "\tActive Orders:" + str(self.num_orders()) + "\n"
+                "\tCORGE:" + str(self.stocks['CORGE']['position']) + "\n"
 
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
