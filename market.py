@@ -153,7 +153,8 @@ class Market:
                 "\tBAR:" + str(self.stocks['BAR']['position']) + \
                 "\tBAZ:" + str(self.stocks['BAZ']['position']) + \
                 "\tQUUX:" + str(self.stocks['QUUX']['position']) + \
-                "\tCORGE:" + str(self.stocks['CORGE']['position'])
+                "\tCORGE:" + str(self.stocks['CORGE']['position']) + \
+                "\tActive Orders:" + str(self.num_orders()) + "\n"
 
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK

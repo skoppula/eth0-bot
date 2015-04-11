@@ -77,4 +77,5 @@ def next_action(market):
     for stock, info in market.stocks.items():
         if market.num_orders() < MAX_NUM_ORDERS:
             did_action = FV_attempt(market, stock, info)
-            if not did_action: penny(market, stock, info)
+            if not did_action:
+                penny(market, stock, info)
