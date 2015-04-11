@@ -23,7 +23,8 @@ def send_json(sckt, msg):
 def setup_connection():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((EX_PRIVATE_IP, JSON_PORT))
+        #s.connect((EX_PRIVATE_IP, JSON_PORT))
+        s.connect(('127.0.0.1', 8080))
         return s
 
     except:
@@ -32,10 +33,12 @@ def setup_connection():
 
 def get_message(sckt):
     try:
-        infile = sckt.makefile()
-	print 'Waiting for message'
-        line = infile.readline()
-        return json.loads(line) 
+        print 'MAKING FILE for message'
+        print 'Waiting for message'
+	buff = sckt.recv(4096)
+	print buff
+        print 'READLINE LINE for message'
+        #return json.loads(line) 
     except:
         print 'OH NO COULD NOT PARSE JSON OR READ FROM SOCKET'
         return None
