@@ -12,12 +12,6 @@ MARKET_INDEX = 0 #0 for slow, 1 for real, 2 for empty
 JSON_PORT = 25000+MARKET_INDEX
 PLAIN_TEXT_PORT = 20000+MARKET_INDEX
 
-def main():
-    s = setup_connection()  
-    if s is not None: 
-        print send_hello(s)
-        print get_message(s)
-
 def send_json(sckt, msg):
     sckt.send(json.dumps(msg) + '\n')
     print 'SENT ', msg
@@ -35,11 +29,12 @@ def setup_connection():
 def get_message(sckt):
     try:
         infile = sckt.makefile()
-        print 'Waiting for message'
         line = infile.readline()
-        return json.loads(line) 
+        js = json.loads(line) 
+        print 'RECIEVED', js
+        return js
     except:
-        print 'OH NO COULD NOT PARSE JSON OR READ FROM SOCKET'
+        print 'COULD NOT PARSE JSON OR READ FROM SOCKET'
         return None
 
 def send_hello(sckt):

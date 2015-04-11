@@ -1,3 +1,5 @@
+import util
+
 INACTIVE = 'INACTIVE'
 OPEN = 'OPEN'
 CLOSED = 'CLOSED'
@@ -24,20 +26,20 @@ class Market:
         self.socket = util.setup_connection()
         if self.socket is not None:
             start_state = util.send_hello(self.socket)
-            if start_state is not None and start_state.type == 'hello':
-                self.cash = start_state.cash
+            if start_state is not None and start_state['type'] == 'hello':
+                self.cash = start_state['cash']
                 self.stocks = {
-                    symbol: {
+                    stock['symbol']: {
                         'book_buy': [],
                         'book_sell': [],
                         'bid': 0,
                         'ask': 0,
-                        'position': position
+                        'position': stock['position']
                     }
-                    for symbol, position in start_state.symbols.items()
+                    for stock in start_state['symbols']
                 }
 
-                if start_state.market_open:
+                if start_state['market_open']:
                     self.state = OPEN
                 else:
                     self.state = CLOSED
