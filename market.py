@@ -107,6 +107,12 @@ class Market:
     def __str__(self):
         return "Market:\n\t" + str(self.stocks) + "\n\t" + str(self.trades) + "\n\t" + str(self.orders) + '\n'
 
+    def get_orders(self, symbol):
+        return {
+            k: v
+            for k, v in self.orders.items() if v['symbol'] == symbol
+        }
+
     def update(self):
         msg = util.get_message(self.socket)
         if msg['type'] == 'book':
