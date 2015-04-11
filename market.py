@@ -95,20 +95,20 @@ class Market:
     def update(self):
         msg = util.get_message(self.socket)
         if msg.type == 'book':
-            self.stocks[msg.symbol].book_buy = msg.buy
-            self.stocks[msg.symbol].book_sell = msg.sell
+            self.stocks[msg.symbol]['book_buy'] = msg['buy']
+            self.stocks[msg.symbol]['book_sell'] = msg['sell']
         elif msg.type == 'trade':
             self.trades[msg.symbol].append({
-                'price': msg.price,
-                'size': msg.size
+                'price': msg['price'],
+                'size': msg['size']
             })
         elif msg.type == 'ack':
-            self.orders[msg.order_id].state = ACK
+            self.orders[msg.order_id]['state'] = ACK
         elif msg.type == 'reject':
-            self.orders[msg.order_id].state = REJECTED
+            self.orders[msg.order_id]['state'] = REJECTED
         elif msg.type == 'fill':
             self.oders[msg.order_id].state = PARTIALLY_FILLED
-            self.orders[msg.order_id].size = \
-                self.orders[msg.order_id].size - msg.size
+            self.orders[msg.order_id]['size'] = \
+                self.orders[msg.order_id]['size'] - msg['size']
         elif msg.type == 'out':
             del self.orders[msg.order_id]
