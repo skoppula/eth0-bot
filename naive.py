@@ -4,8 +4,9 @@ import time
 # Last trade,  self.stocks[symbol]['last trade'] approximate pnl
 # Given a market state, output a fair value,
 
-turnover = 1 #1 second turnover rate
-num_orders = 50 #50 active orders
+PENNY_SIZE = 100
+TURNOVER = 1 #1 second turnover rate
+MAX_NUM_ORDERS = 50 #50 active orders
 
 def halfway_value(market, stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
@@ -44,10 +45,10 @@ def penny(market, stock, info):
     temp = [values['price'] for values in market.get_orders(stock).values()]
     current_buy_order = max(temp) if len(temp) != 0 else 0
     if current_buy_order != info['bid']:
-        market.buy_order(stock, penny_buy, 1)
+        market.buy_order(stock, penny_buy, PENNY_SIZE)
     # Check if we have stock
     if 1 <= info['position']:
-        market.sell_order(stock, penny_sell, 1)
+        market.sell_order(stock, penny_sell, PENNY_SIZE)
         return
     else:
         return
@@ -65,7 +66,7 @@ def order_timeout(m):
     orders = m.orders
     for order, order_info in orders.items():
         if order_info['state'] != market.CANCELLING and \
-           current_time - order_info['timestamp'] > turnover:
+           current_time - order_info['timestamp'] > TURNOVER:
             m.cancel_order(order)
 
 # USE THIS FUNCTION:
@@ -74,6 +75,6 @@ def next_action(market):
     order_timeout(market)
 
     for stock, info in market.stocks.items():
-        if market.num_orders() < num_orders:
+        if market.num_orders() < MAX_NUM_ORDERS:
             did_action = FV_attempt(market, stock, info)
             if not did_action: penny(market, stock, info)
