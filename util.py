@@ -23,8 +23,8 @@ def send_json(sckt, msg):
 def setup_connection():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #s.connect(EX_PRIVATE_IP, JSON_PORT)
-        s.connect(('127.0.0.1', 8080))
+        s.connect((EX_PRIVATE_IP, JSON_PORT))
+        #s.connect(('127.0.0.1', 8080))
         return s
 
     except:
@@ -34,6 +34,7 @@ def setup_connection():
 def get_message(sckt):
     try:
         infile = sckt.makefile()
+	print 'Waiting for message'
         line = infile.readline()
         return json.loads(line) 
     except:
@@ -42,7 +43,7 @@ def get_message(sckt):
 
 def send_hello(sckt):
     hello_msg = {"type": "hello", "team": "SEA"}
-    send_json(s, hello_msg)
+    send_json(sckt, hello_msg)
     mkt_state = get_message(s)
     return mkt_state
     
