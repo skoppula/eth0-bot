@@ -84,4 +84,4 @@ def next_action(m):
             did_action = FV_attempt(m, stock, info)
             if not did_action:
                 penny(m, stock, info)
-
+                ETF_strategy(m)
