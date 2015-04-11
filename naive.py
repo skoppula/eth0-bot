@@ -25,8 +25,8 @@ def penny(market, stock, info):
         return
     penny_buy = info['bid']+1 
     penny_sell = info['ask']-1 
-    current_buy_order = market.order[stock]['price']
-    if current_buy_order < penny_buy:
+    current_buy_order = max([values['price'] for values in market.get_orders(stock).values()])
+    if current_buy_order != info['bid']:
         market.buy_order(stock, penny_buy, 1)
     # Check if we have stock
     if 100 <= info['position']:

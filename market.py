@@ -23,9 +23,9 @@ class Market:
         self.cash = 0
 
         # attempt connection
-        self.socket = util.setup_connection()
+        self.socket, self.infile = util.setup_connection()
         if self.socket is not None:
-            start_state = util.send_hello(self.socket)
+            start_state = util.send_hello(self.socket, self.infile)
             if start_state is not None and start_state['type'] == 'hello':
                 self.cash = start_state['cash']
                 self.stocks = {
@@ -108,7 +108,9 @@ class Market:
         return "Market:\n\t" + str(self.stocks) + "\n\t" + str(self.trades) + "\n\t" + str(self.orders) + '\n'
 
     def update(self):
-        msg = util.get_message(self.socket)
+
+        msg = util.get_message(self.infile)
+
         if msg['type'] == 'book':
 
             self.stocks[msg['symbol']]['book_buy'] = msg['buy']

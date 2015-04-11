@@ -19,15 +19,15 @@ def setup_connection():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((EX_PRIVATE_IP, JSON_PORT))
-        return s
+        infile = s.makefile()
+        return s, infile
 
     except:
         print 'COULD NOT CONNECT'
         return None
 
-def get_message(sckt):
+def get_message(infile):
     try:
-        infile = sckt.makefile()
         line = infile.readline()
         js = json.loads(line) 
         return js
@@ -35,10 +35,10 @@ def get_message(sckt):
         print 'COULD NOT PARSE JSON OR READ FROM SOCKET'
         return None
 
-def send_hello(sckt):
+def send_hello(sckt, infile):
     hello_msg = {"type": "hello", "team": "SEA"}
     send_json(sckt, hello_msg)
-    mkt_state = get_message(sckt)
+    mkt_state = get_message(infile)
     return mkt_state
     
 if __name__ == '__main__':
