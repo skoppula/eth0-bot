@@ -2,15 +2,15 @@ import market
 
 # Given a market state, output a fair value, 
 
-def fair_value(stock):
+def fair_value(stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
     # offer > bid
-    best_bid = stock['bid']
-    best_offer = stock['ask']
+    best_bid = info['bid']
+    best_offer = info['ask']
     return best_bid + .5*(best_offer-best_bid)
     
 def FV_attempt(market, stock, info):
-    FV = fair_value(stock)
+    FV = fair_value(stock, info)
     for sells in info['book_sell']:
         #sells are [price, size]
         if sells[0] < FV:
@@ -23,13 +23,14 @@ def FV_attempt(market, stock, info):
 def penny(market, stock, info):
     if info['bid'] == 0:
         return
-    penny_buy = info['bid']+1
-    penny_sell = info['ask']-1
-    if (penny_buy - penny_sell) > 0:
+    penny_buy = info['bid']+1 
+    penny_sell = info['ask']-1 
+    current_buy_order = market.order[stock]['price']
+    if current_buy_order < penny_buy:
         market.buy_order(stock, penny_buy, 1)
-        # Check if we have stock
-        if 100 <= info['position']:
-            market.sell_order(stock, penny_sell, 1)
+    # Check if we have stock
+    if 100 <= info['position']:
+        market.sell_order(stock, penny_sell, 1)
         return
     else:
         return
@@ -49,7 +50,7 @@ def next_action(market):
     
     for stock, info in market.stocks.items():
         if market.num_orders() < 10:
-            FV_attempt(market, stock, info)
+            penny(market, stock, info)
         
         
         

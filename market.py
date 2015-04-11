@@ -63,7 +63,7 @@ class Market:
         }
         self.orders[order_id] = order
 
-        print 'ORDER #' + order_id + ': \t' + direction + '\t' + symbol + '\t' + price + '\t' + size + '\n'
+        print 'ORDER #' + str(order_id) + ': \t' + str(direction) + '\t' + str(symbol) + '\t' + str(price) + '\t' + str(size) + '\n'
 
         util.send_json(self.socket, {
             'type': 'add',
@@ -131,7 +131,7 @@ class Market:
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
         elif msg['type'] == 'fill':
-            print 'FILLED #' + msg['order_id'] + ': \t' + msg['dir'] + '\t' + msg['symbol'] + '\t' + msg['price'] + '\t' + msg['size'] + '\n'
+            print 'FILLED #' + str(msg['order_id']) + ': \t' + str(msg['dir']) + '\t' + msg['symbol'] + '\t' + str(msg['price']) + '\t' + str(msg['size']) + '\n'
             self.orders[msg['order_id']]['state'] = PARTIALLY_FILLED
             self.orders[msg['order_id']]['size'] = \
                 self.orders[msg['order_id']]['size'] - msg['size']

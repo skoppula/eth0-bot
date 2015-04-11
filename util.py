@@ -14,7 +14,6 @@ PLAIN_TEXT_PORT = 20000+MARKET_INDEX
 
 def send_json(sckt, msg):
     sckt.send(json.dumps(msg) + '\n')
-    print 'SENT ', msg
 
 def setup_connection():
     try:
@@ -31,7 +30,6 @@ def get_message(sckt):
         infile = sckt.makefile()
         line = infile.readline()
         js = json.loads(line) 
-        print 'RECIEVED', js
         return js
     except:
         print 'COULD NOT PARSE JSON OR READ FROM SOCKET'
