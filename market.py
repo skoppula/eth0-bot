@@ -7,11 +7,28 @@ class Market:
         self.stocks = {}
         self.trades = {}
         self.orders = {}
+        self.cash = 0
 
         # attempt connection
         self.socket = util.setup_connection()
         if self.socket is not None:
-            pass
+            start_state = util.send_hello(self.socket)
+            if start_state is not None and start_state.type == 'hello':
+                self.cash = start_state.cash
+                self.stocks = {
+                    symbol: {
+                        'book': [],
+                        'bid': 0,
+                        'ask': 0,
+                        'position': position
+                    }
+                    for symbol, position in start_state.symbols.items()
+                }
+
+                if start_state.market_open:
+                    self.state = "OPEN"
+                else:
+                    self.state = "CLOSED"
 
     def get_next_id(self):
         return ++self.next_id
