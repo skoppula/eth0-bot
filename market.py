@@ -40,6 +40,10 @@ class Market:
                     for stock in start_state['symbols']
                 }
 
+                self.trades = {
+                        stock['symbol']:[] for stock in start_state['symbols']
+                }
+
                 if start_state['market_open']:
                     self.state = OPEN
                 else:
@@ -103,15 +107,12 @@ class Market:
         msg = util.get_message(self.socket)
         if msg['type'] == 'book':
             
-            print self.stocks
             self.stocks[msg['symbol']]['book_buy'] = msg['buy']
             self.stocks[msg['symbol']]['book_sell'] = msg['sell']
 
             self.stocks[msg['symbol']]['bid'] = reduce(lambda bid, x: max(bid, x[0]), msg['buy'], 0)
             self.stocks[msg['symbol']]['ask'] = reduce(lambda ask, x: min(ask, x[0]), msg['sell'], sys.maxint)
 
-            print self.stocks
-            sys.exit(0)
         elif msg['type'] == 'trade':
             self.trades[msg['symbol']].append({
                 'price': msg['price'],

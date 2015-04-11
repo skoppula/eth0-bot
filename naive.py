@@ -16,7 +16,7 @@ def penny(market, stock, info):
     if (penny_buy - penny_sell) > 0:
         market.buy_order(stock, penny_buy, 1)
         # Check if we have stock
-        if sell_size <= info['position']:
+        if 100 <= info['position']:
             market.sell_order(stock, penny_sell, 1)
         return
     else:
