@@ -1,5 +1,0 @@
-TEAM_NAME  = 'SEA'
-
-#SEND HELLO
-def hello():
-
