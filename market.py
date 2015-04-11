@@ -115,7 +115,7 @@ class Market:
         }
 
     def approx_pnl(self):
-        return reduce(lambda pnl, stock: stock['last_trade'] * stock['position'] + pnl, self.stocks, self.cash)
+        return reduce(lambda pnl, stock: stock['last_trade'] * stock['position'] + pnl, self.stocks.values(), self.cash)
 
     def update(self):
         msg = util.get_message(self.infile)
