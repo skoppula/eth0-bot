@@ -2,15 +2,15 @@ import market
 
 # Given a market state, output a fair value, 
 
-def fair_value(stock):
+def fair_value(stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
     # offer > bid
-    best_bid = stock['bid']
-    best_offer = stock['ask']
+    best_bid = info['bid']
+    best_offer = info['ask']
     return best_bid + .5*(best_offer-best_bid)
     
 def FV_attempt(market, stock, info):
-    FV = fair_value(stock)
+    FV = fair_value(stock, info)
     for sells in info['book_sell']:
         #sells are [price, size]
         if sells[0] < FV:
