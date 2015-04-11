@@ -34,7 +34,8 @@ class Market:
                         'book_sell': [],
                         'bid': 0,
                         'ask': 0,
-                        'position': stock['position']
+                        'position': stock['position'],
+                        'last_trade': 0,
                     }
                     for stock in start_state['symbols']
                 }
@@ -113,12 +114,13 @@ class Market:
             for k, v in self.orders.items() if v['symbol'] == symbol
         }
 
-    def update(self):
+    def approx_pnl(self):
+        return reduce(lambda pnl, stock: stock['last_trade'] * stock['position'] + pnl, self.stocks, self.cash)
 
+    def update(self):
         msg = util.get_message(self.infile)
 
         if msg['type'] == 'book':
-
             self.stocks[msg['symbol']]['book_buy'] = msg['buy']
             self.stocks[msg['symbol']]['book_sell'] = msg['sell']
 
@@ -130,6 +132,7 @@ class Market:
                 'price': msg['price'],
                 'size': msg['size']
             })
+            self.trade[msg['symbol']]['last_price'] = msg['price']
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
         elif msg['type'] == 'fill':
@@ -139,7 +142,9 @@ class Market:
                 self.orders[msg['order_id']]['size'] - msg['size']
             sign = 1 if msg['dir'] == BUY else -1
             self.stocks[msg['symbol']]['position'] += msg['size'] * sign
+            self.cash = msg['size'] * msg['price'] * (-sign)
+
         elif msg['type'] == 'out' or msg['type'] == 'reject':
             del self.orders[msg['order_id']]
 
-        #print self
+        print approx_pnl
