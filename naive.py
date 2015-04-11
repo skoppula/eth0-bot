@@ -3,11 +3,13 @@ import market
 # Given a market state, output a fair value, 
 
 def fair_value(stock):
-    # Halfway point between best bid and best offer for stock
+    # Halfway point between best bid (buy), best offer (sell) for stock
+    # offer > bid
     best_bid = stock['bid']
     best_offer = stock['ask']
     return best_bid + .5*(best_offer-best_bid)
     
+
 def penny(market, stock, info):
     if info['bid'] == 0:
         return
@@ -33,9 +35,11 @@ def ETF_strategy(stocks):
 # USE THIS FUNCTION:
 
 def next_action(market):
-    # takes in a market, computes a fair value, outputs some action based on strategy   
+    # takes in a market, computes a fair value, outputs some action based on strategy
+    
     for stock, info in market.stocks.items():
-        penny(market, stock, info)
+        if market.num_orders < 10:
+            penny(market, stock, info)
         
         
         
