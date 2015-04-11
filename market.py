@@ -99,11 +99,11 @@ class Market:
     def convert_sell_order(self, symbol, size):
         self.__send__convert(SELL, symbol, size)
 
-    def cancel_order(self, id):
+    def cancel_order(self, order_id):
         print 'CANCEL #' + str(order_id) + '\n'
         util.send_json(self.socket, {
             'type': 'cancel',
-            'order_id': id
+            'order_id': order_id
         })
 
     def num_orders(self):
