@@ -1,3 +1,4 @@
+import sys
 import util
 
 INACTIVE = 'INACTIVE'
@@ -95,14 +96,22 @@ class Market:
             'order_id': id
         })
 
+    def __str__(self):
+        return "Market:\n\t" + str(self.stocks) + "\n\t" + str(self.trades) + "\n\t" + str(self.orders)
+
     def update(self):
         msg = util.get_message(self.socket)
         if msg['type'] == 'book':
+            
+            print self.stocks
             self.stocks[msg['symbol']]['book_buy'] = msg['buy']
             self.stocks[msg['symbol']]['book_sell'] = msg['sell']
 
             self.stocks[msg['symbol']]['bid'] = reduce(lambda bid, x: max(bid, x[0]), msg['buy'], 0)
-            self.stocks[msg['symbol']]['ask'] = reduce(lambda ask, x: max(ask, x[0]), msg['sell'], 0)
+            self.stocks[msg['symbol']]['ask'] = reduce(lambda ask, x: min(ask, x[0]), msg['sell'], sys.maxint)
+
+            print self.stocks
+            sys.exit(0)
         elif msg['type'] == 'trade':
             self.trades[msg['symbol']].append({
                 'price': msg['price'],
@@ -119,4 +128,4 @@ class Market:
         elif msg['type'] == 'out':
             del self.orders[msg['order_id']]
 
-        print self
+        #print self

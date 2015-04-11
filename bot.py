@@ -4,9 +4,10 @@ import util
 import naive
 
 m = Market()
-
-while True:
+i=0
+while i<1000:
     naive.next_action(m)
     m.update()
+    i += 1
     # Update Market
     # Send next order
