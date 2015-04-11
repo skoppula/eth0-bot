@@ -60,17 +60,17 @@ def ETF_strategy(stocks):
     else:
         return -1
 
-def order_timeout(orders):
+def order_timeout(market):
     current_time = time.time()
-    for order, order_info in orders:
+    orders = market.orders
+    for order, order_info in orders.items():
         if current_time - order_info['timestamp'] > turnover:
             market.cancel_order(order)
-
 
 # USE THIS FUNCTION:
 def next_action(market):
     # takes in a market, computes a fair value, outputs some action based on strategy
-    order_timeout(market.orders)
+    order_timeout(market)
     
     for stock, info in market.stocks.items():
         if market.num_orders() < num_orders:
