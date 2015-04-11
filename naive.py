@@ -1,3 +1,4 @@
+import math
 import market
 import statistics
 import time
@@ -5,9 +6,9 @@ import random
 # Last trade,  self.stocks[symbol]['last trade'] approximate pnl
 # Given a market state, output a fair value,
 
-PENNY_SIZE = 10
-TURNOVER = 5 #2 second turnover rate
-MAX_NUM_ORDERS = 10 #50 active orders
+PENNY_SIZE = 1
+TURNOVER = 1 #2 second turnover rate
+MAX_NUM_ORDERS = 20 #50 active orders
 
 def halfway_value(market, stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
@@ -43,12 +44,14 @@ def penny(market, stock, info):
         return
     penny_buy = info['bid']+1
     penny_sell = info['ask']-1
-    temp = [values['price'] for values in market.get_orders(stock).values()]
+    temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'BUY']
     current_buy_order = max(temp) if len(temp) != 0 else 0
     if current_buy_order != info['bid']:
         market.buy_order(stock, penny_buy, PENNY_SIZE)
-    # Check if we have stock
-    if 1 <= info['position']:
+
+    temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'SELL']
+    current_sell_order = min(temp) if len(temp) != 0 else 0
+    if current_sell_order != info['bid']:
         market.sell_order(stock, penny_sell, PENNY_SIZE)
         return
     else:
@@ -84,4 +87,4 @@ def next_action(m):
             did_action = FV_attempt(m, stock, info)
             if not did_action:
                 penny(m, stock, info)
-                ETF_strategy(m)
+                #ETF_strategy(m)

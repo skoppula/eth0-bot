@@ -101,7 +101,7 @@ class Market:
         self.__send_convert(BUY, symbol, size)
 
     def convert_sell_order(self, symbol, size):
-        self.__send__convert(SELL, symbol, size)
+        self.__send_convert(SELL, symbol, size)
 
     def cancel_order(self, order_id):
         self.orders[order_id]['state'] = CANCELLING
