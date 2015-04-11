@@ -102,11 +102,11 @@ class Market:
 
     def cancel_order(self, order_id):
         print 'CANCEL #' + str(order_id) + '\n'
-        self.orders[order_id]['state'] = CANCELLING
         util.send_json(self.socket, {
             'type': 'cancel',
             'order_id': order_id
         })
+        del self.orders[order_id]
 
     def num_orders(self):
         return len(self.orders)

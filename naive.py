@@ -66,8 +66,7 @@ def order_timeout(m):
     current_time = time.time()
     orders = m.orders
     for order, order_info in orders.items():
-        if order_info['state'] != market.CANCELLING and \
-           current_time - order_info['timestamp'] > TURNOVER:
+        if current_time - order_info['timestamp'] > TURNOVER:
             m.cancel_order(order)
 
 # USE THIS FUNCTION:
