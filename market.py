@@ -132,7 +132,7 @@ class Market:
                 'price': msg['price'],
                 'size': msg['size']
             })
-            self.trade[msg['symbol']]['last_price'] = msg['price']
+            self.stocks[msg['symbol']]['last_price'] = msg['price']
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
         elif msg['type'] == 'fill':
