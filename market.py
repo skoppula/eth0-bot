@@ -9,6 +9,7 @@ CLOSED = 'CLOSED'
 PENDING = 'PENDING'
 ACK = 'ACK'
 PARTIALLY_FILLED = 'PARTIALLY_FILLED'
+CANCELLING = 'CANCELLING'
 
 BUY = 'BUY'
 SELL = 'SELL'
@@ -101,6 +102,7 @@ class Market:
 
     def cancel_order(self, order_id):
         print 'CANCEL #' + str(order_id) + '\n'
+        self.orders[order_id]['state'] = CANCELLING
         util.send_json(self.socket, {
             'type': 'cancel',
             'order_id': order_id

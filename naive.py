@@ -2,7 +2,7 @@ import market
 import statistics
 import time
 # Last trade,  self.stocks[symbol]['last trade'] approximate pnl
-# Given a market state, output a fair value, 
+# Given a market state, output a fair value,
 
 turnover = 1 #1 second turnover rate
 num_orders = 50 #50 active orders
@@ -13,7 +13,7 @@ def halfway_value(market, stock, info):
     best_bid = info['bid']
     best_offer = info['ask']
     return statistics.median([best_bid, best_offer])
-    
+
 def median_average(market, stock, info):
     temp_bid = [bids['price'] for bids in info['book_buy']]
     temp_offer = [offers['price'] for offers in info['book_sell']]
@@ -39,8 +39,8 @@ def FV_attempt(market, stock, info):
 def penny(market, stock, info):
     if info['bid'] == 0:
         return
-    penny_buy = info['bid']+1 
-    penny_sell = info['ask']-1 
+    penny_buy = info['bid']+1
+    penny_sell = info['ask']-1
     temp = [values['price'] for values in market.get_orders(stock).values()]
     current_buy_order = max(temp) if len(temp) != 0 else 0
     if current_buy_order != info['bid']:
@@ -51,7 +51,7 @@ def penny(market, stock, info):
         return
     else:
         return
-   
+
 def ETF_strategy(stocks):
     # Calculate the best buys and sells for a stock
     if stock == "CORGE":
@@ -60,22 +60,20 @@ def ETF_strategy(stocks):
     else:
         return -1
 
-def order_timeout(market):
+def order_timeout(m):
     current_time = time.time()
-    orders = market.orders
+    orders = m.orders
     for order, order_info in orders.items():
-        if current_time - order_info['timestamp'] > turnover:
-            market.cancel_order(order)
+        if order_info['state'] != market.CANCELLING and \
+           current_time - order_info['timestamp'] > turnover:
+            m.cancel_order(order)
 
 # USE THIS FUNCTION:
 def next_action(market):
     # takes in a market, computes a fair value, outputs some action based on strategy
     order_timeout(market)
-    
+
     for stock, info in market.stocks.items():
         if market.num_orders() < num_orders:
             did_action = FV_attempt(market, stock, info)
             if not did_action: penny(market, stock, info)
-        
-        
-        
