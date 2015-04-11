@@ -14,6 +14,8 @@ CANCELLING = 'CANCELLING'
 BUY = 'BUY'
 SELL = 'SELL'
 
+NUM_AVG = 50
+
 
 class Market:
     def __init__(self):
@@ -39,6 +41,7 @@ class Market:
                         'ask': 0,
                         'position': stock['position'],
                         'last_trade': 0,
+                        'last_trades': []
                     }
                     for stock in start_state['symbols']
                 }
@@ -121,6 +124,9 @@ class Market:
             for k, v in self.orders.items() if v['symbol'] == symbol
         }
 
+    def get_moving_avg(self, symbol):
+        return sum(self.stocks[symbol]['last_trades']) / NUM_AVG
+
     def approx_pnl(self):
         return reduce(
             lambda pnl, stock: stock['last_trade'] * stock['position'] + pnl,
@@ -153,6 +159,11 @@ class Market:
                 'size': msg['size']
             })
             self.stocks[msg['symbol']]['last_trade'] = msg['price']
+
+            self.stocks[mgs['symbol']]['last_trades'].append(msg['price'])
+            if (len(self.stocks[mgs['symbol']]['last_trades']) > NUM_AVG):
+                self.stocks[mgs['symbol']]['last_trades'].popleft()
+
             print "PNL:" + str(self.approx_pnl()) + "\tCASH:" + str(self.cash) + \
                 "\tFOO:" + str(self.stocks['FOO']['position']) + \
                 "\tBAR:" + str(self.stocks['BAR']['position']) + \

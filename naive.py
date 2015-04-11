@@ -42,20 +42,19 @@ def FV_attempt(market, stock, info):
 def penny(market, stock, info):
     if info['bid'] == 0:
         return
-    penny_buy = info['bid']+1
-    penny_sell = info['ask']-1
-    temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'BUY']
-    current_buy_order = max(temp) if len(temp) != 0 else 0
-    if current_buy_order != info['bid']:
-        market.buy_order(stock, penny_buy, PENNY_SIZE)
-
-    temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'SELL']
-    current_sell_order = min(temp) if len(temp) != 0 else 0
-    if current_sell_order != info['bid']:
-        market.sell_order(stock, penny_sell, PENNY_SIZE)
-        return
+    penny_buy = info['bid'] + 1
+    penny_sell = info['ask'] - 1
+    if market.get_moving_avg(stock) > market.stocks[stock]['last_trade']:
+        temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'SELL']
+        current_sell_order = min(temp) if len(temp) != 0 else 0
+        if current_sell_order != info['bid']:
+            market.sell_order(stock, penny_sell, PENNY_SIZE)
     else:
-        return
+        temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'BUY']
+        current_buy_order = max(temp) if len(temp) != 0 else 0
+        if current_buy_order != info['bid']:
+            market.buy_order(stock, penny_buy, PENNY_SIZE)
+
 
 def ETF_strategy(m):
     # Calculate the best buys and sells for a stock
@@ -63,7 +62,7 @@ def ETF_strategy(m):
     buy_margin = m.stocks["FOO"]['bid']*3 + m.stocks["BAR"]['bid']*8 - m.stocks["CORGE"]['ask']*10
     if sell_margin > 100:
         m.convert_buy_order("CORGE", m.stocks['bidsize'])
-        m.sell_order("CORGE", m.stocks["CORGE"]['bid'], m.stocks["CORGE"]['bidsize']) 
+        m.sell_order("CORGE", m.stocks["CORGE"]['bid'], m.stocks["CORGE"]['bidsize'])
     if buy_margin > 100:
         # Convert CORGE to FOO/BAR and sell at bid price
         num_corge = m.stocks["CORGE"]['position']
