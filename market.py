@@ -1,9 +1,20 @@
-import util
+INACTIVE = 'INACTIVE'
+OPEN = 'OPEN'
+CLOSED = 'CLOSED'
+
+PENDING = 'PENDING'
+ACK = 'ACK'
+REJECTED = 'REJECT'
+PARTIALLY_FILLED = 'PARTIALLY_FILLED'
+
+BUY = 'BUY'
+SELL = 'SELL'
+
 
 class Market:
     def __init__(self):
         self.next_id = 0
-        self.state = "INACTIVE"
+        self.state = INACTIVE
         self.stocks = {}
         self.trades = {}
         self.orders = {}
@@ -17,7 +28,8 @@ class Market:
                 self.cash = start_state.cash
                 self.stocks = {
                     symbol: {
-                        'book': [],
+                        'book_buy': [],
+                        'book_sell': [],
                         'bid': 0,
                         'ask': 0,
                         'position': position
@@ -26,17 +38,27 @@ class Market:
                 }
 
                 if start_state.market_open:
-                    self.state = "OPEN"
+                    self.state = OPEN
                 else:
-                    self.state = "CLOSED"
+                    self.state = CLOSED
 
     def get_next_id(self):
         return ++self.next_id
 
     def __send_order(self, direction, symbol, price, size):
+        order_id = self.get_next_id()
+        order = {
+            'state': PENDING,
+            'symbol': symbol,
+            'dir': direction,
+            'price': price,
+            'size': size
+        }
+        self.orders[order_id] = order
+
         util.send_json(self.socket, {
             'type': 'add',
-            'order_id': self.get_next_id(),
+            'order_id': order_id,
             'symbol': symbol,
             'dir': direction,
             'price': price,
@@ -53,19 +75,40 @@ class Market:
         })
 
     def buy_order(self, symbol, price, size):
-        self.__send_order('BUY', symbol, price, size)
+        self.__send_order(BUY, symbol, price, size)
 
     def sell_order(self, symbol, price, size):
-        self.__send_order('SELL', symbol, price, size)
+        self.__send_order(SELL, symbol, price, size)
 
     def convert_buy_order(self, symbol, size):
-        self.__send_convert('BUY', symbol, size)
+        self.__send_convert(BUY, symbol, size)
 
     def convert_sell_order(self, symbol, size):
-        self.__send__convert('SELL', symbol, size)
+        self.__send__convert(SELL, symbol, size)
 
     def cancel_order(self, id):
         util.send_json(self.socket, {
             'type': 'cancel',
             'order_id': id
         })
+
+    def update(self):
+        msg = util.get_message(self.socket)
+        if msg.type == 'book':
+            self.stocks[msg.symbol].book_buy = msg.buy
+            self.stocks[msg.symbol].book_sell = msg.sell
+        elif msg.type == 'trade':
+            self.trades[msg.symbol].append({
+                'price': msg.price,
+                'size': msg.size
+            })
+        elif msg.type == 'ack':
+            self.orders[msg.order_id].state = ACK
+        elif msg.type == 'reject':
+            self.orders[msg.order_id].state = REJECTED
+        elif msg.type == 'fill':
+            self.oders[msg.order_id].state = PARTIALLY_FILLED
+            self.orders[msg.order_id].size = \
+                self.orders[msg.order_id].size - msg.size
+        elif msg.type == 'out':
+            del self.orders[msg.order_id]
