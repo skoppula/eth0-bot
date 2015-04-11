@@ -140,9 +140,11 @@ class Market:
             self.orders[msg['order_id']]['state'] = PARTIALLY_FILLED
             self.orders[msg['order_id']]['size'] = \
                 self.orders[msg['order_id']]['size'] - msg['size']
+
+            # update position and cash
             sign = 1 if msg['dir'] == BUY else -1
             self.stocks[msg['symbol']]['position'] += msg['size'] * sign
-            self.cash = msg['size'] * msg['price'] * (-sign)
+            self.cash = self.cash + msg['size'] * msg['price'] * (-sign)
 
         elif msg['type'] == 'out' or msg['type'] == 'reject':
             del self.orders[msg['order_id']]
