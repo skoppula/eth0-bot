@@ -14,17 +14,18 @@ PLAIN_TEXT_PORT = 20000+MARKET_INDEX
 
 def main():
     s = setup_connection()  
-    print send_hello(s)
+    if s is not None: 
+        print send_hello(s)
+        print get_message(s)
 
 def send_json(sckt, msg):
-    sckt.send(json.dumps(msg))
+    sckt.send(json.dumps(msg) + '\n')
     print 'SENT ', msg
 
 def setup_connection():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #s.connect((EX_PRIVATE_IP, JSON_PORT))
-        s.connect(('127.0.0.1', 8080))
+        s.connect((EX_PRIVATE_IP, JSON_PORT))
         return s
 
     except:
@@ -33,12 +34,10 @@ def setup_connection():
 
 def get_message(sckt):
     try:
-        print 'MAKING FILE for message'
+        infile = sckt.makefile()
         print 'Waiting for message'
-	buff = sckt.recv(4096)
-	print buff
-        print 'READLINE LINE for message'
-        #return json.loads(line) 
+        line = infile.readline()
+        return json.loads(line) 
     except:
         print 'OH NO COULD NOT PARSE JSON OR READ FROM SOCKET'
         return None
