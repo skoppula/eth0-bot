@@ -7,6 +7,6 @@ m = Market()
 
 while True:
     naive.next_action(m)
-    market.update()
+    m.update()
     # Update Market
     # Send next order
