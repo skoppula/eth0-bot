@@ -23,6 +23,7 @@ class Market:
         self.trades = {}
         self.orders = {}
         self.cash = 0
+        self.num_orders = 0
 
         # attempt connection
         self.socket, self.infile = util.setup_connection()
@@ -79,6 +80,8 @@ class Market:
             'size': size
         })
 
+        self.num_orders = self.num_orders + 1
+
     def __send_convert(self, direction, symbol, size):
         util.send_json(self.socket, {
             'type': 'convert',
@@ -107,9 +110,7 @@ class Market:
             'type': 'cancel',
             'order_id': order_id
         })
-
-    def num_orders(self):
-        return len(self.orders)
+        self.num_orders = max(self.num_orders - 1, 0)
 
     def __str__(self):
         return "Market:\n\t" + str(self.stocks) + "\n\t" + str(self.trades) \
@@ -174,3 +175,4 @@ class Market:
         elif msg['type'] == 'out' or msg['type'] == 'reject':
             if 'order_id' in self.orders:
                 del self.orders[msg['order_id']]
+                self.num_orders = max(self.num_orders - 1, 0)
