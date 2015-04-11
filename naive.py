@@ -1,8 +1,11 @@
 import market
 import statistics
-
+import time
 # Last trade,  self.stocks[symbol]['last trade'] approximate pnl
 # Given a market state, output a fair value, 
+
+turnover = 1 #1 second turnover rate
+num_orders = 50 #50 active orders
 
 def halfway_value(market, stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
@@ -57,13 +60,20 @@ def ETF_strategy(stocks):
     else:
         return -1
 
-# USE THIS FUNCTION:
+def order_timeout(orders):
+    current_time = time.time()
+    for order, order_info in orders:
+        if current_time - order_info['timestamp'] > turnover:
+            market.cancel_order(order)
 
+
+# USE THIS FUNCTION:
 def next_action(market):
     # takes in a market, computes a fair value, outputs some action based on strategy
+    order_timeout(market.orders)
     
     for stock, info in market.stocks.items():
-        if market.num_orders() < 10:
+        if market.num_orders() < num_orders:
             did_action = FV_attempt(market, stock, info)
             if not did_action: penny(market, stock, info)
         
