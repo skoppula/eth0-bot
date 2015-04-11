@@ -14,17 +14,16 @@ PLAIN_TEXT_PORT = 20000+MARKET_INDEX
 
 def main():
     s = setup_connection()  
-    print get_message(s)
     print send_hello(s)
 
 def send_json(sckt, msg):
     sckt.send(json.dumps(msg))
+    print 'SENT ', msg
 
 def setup_connection():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((EX_PRIVATE_IP, JSON_PORT))
-        #s.connect(('127.0.0.1', 8080))
         return s
 
     except:
@@ -44,7 +43,7 @@ def get_message(sckt):
 def send_hello(sckt):
     hello_msg = {"type": "hello", "team": "SEA"}
     send_json(sckt, hello_msg)
-    mkt_state = get_message(s)
+    mkt_state = get_message(sckt)
     return mkt_state
     
 if __name__ == '__main__':
