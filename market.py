@@ -147,4 +147,4 @@ class Market:
         elif msg['type'] == 'out' or msg['type'] == 'reject':
             del self.orders[msg['order_id']]
 
-        print self.approx_pnl()
+        print "PNL:" self.approx_pnl() + "\tCASH:" + self.cash
