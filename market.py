@@ -16,7 +16,7 @@ class Market:
             if start_state is not None and start_state.type == 'hello':
                 self.cash = start_state.cash
                 self.stocks = {
-                    'stock': {
+                    symbol: {
                         'book': [],
                         'bid': 0,
                         'ask': 0,
