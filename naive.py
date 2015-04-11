@@ -9,11 +9,15 @@ def fair_value(stock):
     return best_bid + .5*(best_offer-best_bid)
     
 def penny(market, stock, info):
+    if info['bid'] == 0:
+        return
     penny_buy = info['bid']+1
     penny_sell = info['ask']-1
     if (penny_buy - penny_sell) > 0:
         market.buy_order(stock, penny_buy, 1)
-        market.sell_order(stock, penny_sell, 1)
+        # Check if we have stock
+        if sell_size <= info['position']:
+            market.sell_order(stock, penny_sell, 1)
         return
     else:
         return
