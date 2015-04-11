@@ -4,7 +4,7 @@ import time
 # Last trade,  self.stocks[symbol]['last trade'] approximate pnl
 # Given a market state, output a fair value,
 
-PENNY_SIZE = 100
+PENNY_SIZE = 10
 TURNOVER = 1 #1 second turnover rate
 MAX_NUM_ORDERS = 50 #50 active orders
 
@@ -40,8 +40,8 @@ def FV_attempt(market, stock, info):
 def penny(market, stock, info):
     if info['bid'] == 0:
         return
-    penny_buy = info['bid']+1
-    penny_sell = info['ask']-1
+    penny_buy = info['bid'] + 1
+    penny_sell = info['ask'] - 1
     temp = [values['price'] for values in market.get_orders(stock).values()]
     current_buy_order = max(temp) if len(temp) != 0 else 0
     if current_buy_order != info['bid']:
@@ -74,8 +74,8 @@ def next_action(market):
     # takes in a market, computes a fair value, outputs some action based on strategy
     order_timeout(market)
 
-    for stock, info in market.stocks.items():
-        if market.num_orders() < MAX_NUM_ORDERS:
+    while market.num_orders() < MAX_NUM_ORDERS:
+        for stock, info in market.stocks.items():
             did_action = FV_attempt(market, stock, info)
             if not did_action:
                 penny(market, stock, info)
