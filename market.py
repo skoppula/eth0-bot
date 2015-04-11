@@ -172,4 +172,5 @@ class Market:
             self.cash = self.cash + msg['size'] * msg['price'] * (-sign)
 
         elif msg['type'] == 'out' or msg['type'] == 'reject':
-            del self.orders[msg['order_id']]
+            if 'order_id' in self.orders:
+                del self.orders[msg['order_id']]
