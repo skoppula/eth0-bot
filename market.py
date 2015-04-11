@@ -95,6 +95,9 @@ class Market:
             'order_id': id
         })
 
+    def num_orders(self):
+        return len(self.orders)
+
     def update(self):
         msg = util.get_message(self.socket)
         if msg['type'] == 'book':
@@ -116,6 +119,8 @@ class Market:
             self.orders[msg['order_id']]['state'] = PARTIALLY_FILLED
             self.orders[msg['order_id']]['size'] = \
                 self.orders[msg['order_id']]['size'] - msg['size']
+            sign = 1 if msg['dir'] == BUY else -1
+            self.stocks[msg['symbol']]['position'] += msg['size'] * sign
         elif msg['type'] == 'out':
             del self.orders[msg['order_id']]
 
