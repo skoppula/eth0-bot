@@ -1,5 +1,6 @@
 import sys
 import util
+import time
 
 INACTIVE = 'INACTIVE'
 OPEN = 'OPEN'
@@ -41,7 +42,7 @@ class Market:
                 }
 
                 self.trades = {
-                        stock['symbol']:[] for stock in start_state['symbols']
+                    stock['symbol']: [] for stock in start_state['symbols']
                 }
 
                 if start_state['market_open']:
@@ -60,11 +61,13 @@ class Market:
             'symbol': symbol,
             'dir': direction,
             'price': price,
-            'size': size
+            'size': size,
+            'timestamp': time.time()
         }
         self.orders[order_id] = order
 
-        print 'ORDER #' + str(order_id) + ': \t' + str(direction) + '\t' + str(symbol) + '\t' + str(price) + '\t' + str(size) + '\n'
+        print 'ORDER #' + str(order_id) + ': \t' + str(direction) + '\t' \
+            + str(symbol) + '\t' + str(price) + '\t' + str(size) + '\n'
 
         util.send_json(self.socket, {
             'type': 'add',
@@ -106,7 +109,8 @@ class Market:
         return len(self.orders)
 
     def __str__(self):
-        return "Market:\n\t" + str(self.stocks) + "\n\t" + str(self.trades) + "\n\t" + str(self.orders) + '\n'
+        return "Market:\n\t" + str(self.stocks) + "\n\t" + str(self.trades) \
+            + "\n\t" + str(self.orders) + '\n'
 
     def get_orders(self, symbol):
         return {
@@ -115,7 +119,11 @@ class Market:
         }
 
     def approx_pnl(self):
-        return reduce(lambda pnl, stock: stock['last_trade'] * stock['position'] + pnl, self.stocks.values(), self.cash)
+        return reduce(
+            lambda pnl, stock: stock['last_trade'] * stock['position'] + pnl,
+            self.stocks.values(),
+            self.cash
+        )
 
     def update(self):
         msg = util.get_message(self.infile)
@@ -124,8 +132,12 @@ class Market:
             self.stocks[msg['symbol']]['book_buy'] = msg['buy']
             self.stocks[msg['symbol']]['book_sell'] = msg['sell']
 
-            self.stocks[msg['symbol']]['bid'] = reduce(lambda bid, x: max(bid, x[0]), msg['buy'], 0)
-            self.stocks[msg['symbol']]['ask'] = reduce(lambda ask, x: min(ask, x[0]), msg['sell'], sys.maxint)
+            self.stocks[msg['symbol']]['bid'] = reduce(
+                lambda bid, x: max(bid, x[0]), msg['buy'], 0
+            )
+            self.stocks[msg['symbol']]['ask'] = reduce(
+                lambda ask, x: min(ask, x[0]), msg['sell'], sys.maxint
+            )
 
         elif msg['type'] == 'trade':
             self.trades[msg['symbol']].append({
@@ -140,12 +152,13 @@ class Market:
                 "\tQUUX:" + str(self.stocks['QUUX']['position']) + \
                 "\tCORGE:" + str(self.stocks['CORGE']['position'])
 
-
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
 
         elif msg['type'] == 'fill':
-            print 'FILLED #' + str(msg['order_id']) + ': \t' + str(msg['dir']) + '\t' + msg['symbol'] + '\t' + str(msg['price']) + '\t' + str(msg['size']) + '\n'
+            print 'FILLED #' + str(msg['order_id']) + ': \t' + str(msg['dir']) \
+                + '\t' + msg['symbol'] + '\t' + str(msg['price']) + '\t' \
+                + str(msg['size']) + '\n'
             self.orders[msg['order_id']]['state'] = PARTIALLY_FILLED
             self.orders[msg['order_id']]['size'] = \
                 self.orders[msg['order_id']]['size'] - msg['size']
