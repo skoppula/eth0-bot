@@ -11,25 +11,30 @@ def fair_value(stock, info):
     
 def FV_attempt(market, stock, info):
     FV = fair_value(stock, info)
+    did_action = False
     for sells in info['book_sell']:
         #sells are [price, size]
         if sells[0] < FV:
             market.buy_order(stock, sells[0], sells[1])
+            did_action = True
     for buys in info['book_buy']:
         if buys[0] > FV:
             if info['position'] > buys[1]:
                 market.sell_order(stock, buys[0], buys[1])
+                did_action = True
+    return did_action
 
 def penny(market, stock, info):
     if info['bid'] == 0:
         return
     penny_buy = info['bid']+1 
     penny_sell = info['ask']-1 
-    current_buy_order = max([values['price'] for values in market.get_orders(stock).values()])
+    temp = [values['price'] for values in market.get_orders(stock).values()]
+    current_buy_order = max(temp) if len(temp) != 0 else 0
     if current_buy_order != info['bid']:
         market.buy_order(stock, penny_buy, 1)
     # Check if we have stock
-    if 100 <= info['position']:
+    if 1 <= info['position']:
         market.sell_order(stock, penny_sell, 1)
         return
     else:
@@ -50,7 +55,8 @@ def next_action(market):
     
     for stock, info in market.stocks.items():
         if market.num_orders() < 10:
-            penny(market, stock, info)
+            did_action = FV_attempt(market, stock, info)
+            if not did_action: penny(market, stock, info)
         
         
         
