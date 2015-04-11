@@ -133,8 +133,11 @@ class Market:
                 'size': msg['size']
             })
             self.stocks[msg['symbol']]['last_trade'] = msg['price']
+            print "PNL:" + str(self.approx_pnl()) + "\tCASH:" + str(self.cash)
+
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
+
         elif msg['type'] == 'fill':
             print 'FILLED #' + str(msg['order_id']) + ': \t' + str(msg['dir']) + '\t' + msg['symbol'] + '\t' + str(msg['price']) + '\t' + str(msg['size']) + '\n'
             self.orders[msg['order_id']]['state'] = PARTIALLY_FILLED
@@ -149,4 +152,3 @@ class Market:
         elif msg['type'] == 'out' or msg['type'] == 'reject':
             del self.orders[msg['order_id']]
 
-        print "PNL:" self.approx_pnl() + "\tCASH:" + self.cash

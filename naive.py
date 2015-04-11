@@ -19,7 +19,7 @@ def median_average(market, stock, info):
     return .5*(median_bid + median_offer)
 
 def FV_attempt(market, stock, info):
-    FV = halfway_value(market, stock, info)
+    FV = median_average(market, stock, info)
     did_action = False
     for sells in info['book_sell']:
         #sells are [price, size]
