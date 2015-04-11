@@ -23,10 +23,12 @@ def FV_attempt(market, stock, info):
 def penny(market, stock, info):
     if info['bid'] == 0:
         return
-    penny_buy = info['bid']+1
-    penny_sell = info['ask']-1
-    market.buy_order(stock, penny_buy, 1)
-   # Check if we have stock
+    penny_buy = info['bid']+1 
+    penny_sell = info['ask']-1 
+    current_buy_order = market.order[stock]['price']
+    if current_buy_order < penny_buy:
+        market.buy_order(stock, penny_buy, 1)
+    # Check if we have stock
     if 100 <= info['position']:
         market.sell_order(stock, penny_sell, 1)
         return
