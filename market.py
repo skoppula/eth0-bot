@@ -9,6 +9,7 @@ CLOSED = 'CLOSED'
 PENDING = 'PENDING'
 ACK = 'ACK'
 PARTIALLY_FILLED = 'PARTIALLY_FILLED'
+CANCELLING = 'CANCELLING'
 
 BUY = 'BUY'
 SELL = 'SELL'
@@ -99,11 +100,13 @@ class Market:
     def convert_sell_order(self, symbol, size):
         self.__send__convert(SELL, symbol, size)
 
-    def cancel_order(self, id):
+    def cancel_order(self, order_id):
+        print 'CANCEL #' + str(order_id) + '\n'
         util.send_json(self.socket, {
             'type': 'cancel',
-            'order_id': id
+            'order_id': order_id
         })
+        del self.orders[order_id]
 
     def num_orders(self):
         return len(self.orders)
@@ -150,7 +153,8 @@ class Market:
                 "\tBAR:" + str(self.stocks['BAR']['position']) + \
                 "\tBAZ:" + str(self.stocks['BAZ']['position']) + \
                 "\tQUUX:" + str(self.stocks['QUUX']['position']) + \
-                "\tCORGE:" + str(self.stocks['CORGE']['position'])
+                "\tCORGE:" + str(self.stocks['CORGE']['position']) + \
+                "\tActive Orders:" + str(self.num_orders()) + "\n"
 
         elif msg['type'] == 'ack':
             self.orders[msg['order_id']]['state'] = ACK
@@ -169,4 +173,5 @@ class Market:
             self.cash = self.cash + msg['size'] * msg['price'] * (-sign)
 
         elif msg['type'] == 'out' or msg['type'] == 'reject':
-            del self.orders[msg['order_id']]
+            if 'order_id' in self.orders:
+                del self.orders[msg['order_id']]
