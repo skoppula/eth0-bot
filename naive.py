@@ -62,7 +62,7 @@ def ETF_strategy(stocks):
 
 def order_timeout(orders):
     current_time = time.time()
-    for order, order_info in orders:
+    for order, order_info in orders.items():
         if current_time - order_info['timestamp'] > turnover:
             market.cancel_order(order)
 
