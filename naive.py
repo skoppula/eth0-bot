@@ -38,7 +38,7 @@ def next_action(market):
     # takes in a market, computes a fair value, outputs some action based on strategy
     
     for stock, info in market.stocks.items():
-        if market.num_orders < 10:
+        if market.num_orders() < 10:
             penny(market, stock, info)
         
         
