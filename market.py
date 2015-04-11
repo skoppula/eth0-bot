@@ -135,12 +135,17 @@ class Market:
             self.stocks[msg['symbol']]['book_buy'] = msg['buy']
             self.stocks[msg['symbol']]['book_sell'] = msg['sell']
 
-            self.stocks[msg['symbol']]['bid'] = reduce(
-                lambda bid, x: max(bid, x[0]), msg['buy'], 0
+            max_bid = reduce(
+                lambda bid, x: bid if bid[0] > x[0] else x, msg['buy'], [0, 0]
             )
-            self.stocks[msg['symbol']]['ask'] = reduce(
-                lambda ask, x: min(ask, x[0]), msg['sell'], sys.maxint
+            self.stocks[msg['symbol']]['bid'] = max_bid[0]
+            self.stocks[msg['symbol']]['bid_size'] = max_bid[1]
+
+            min_ask = reduce(
+                lambda ask, x: ask if ask[0] > x[0] else x, msg['sell'], [sys.maxint, 0]
             )
+            self.stocks[msg['symbol']]['ask'] = min_ask[0]
+            self.stocks[msg['symbol']]['ask_size'] = min_ask[1]
 
         elif msg['type'] == 'trade':
             self.trades[msg['symbol']].append({
