@@ -59,8 +59,11 @@ def penny(market, stock, info):
 
 def ETF_strategy(m):
     # Calculate the best buys and sells for a stock
-    sell_margin = m.stocks["CORGE"]['ask']*10 - m.stocks["FOO"]['bid']*3 - m.stocks["BAR"]['bid']*8
+    sell_margin = m.stocks["CORGE"]['bid']*10 - m.stocks["FOO"]['ask']*3 - m.stocks["BAR"]['ask']*8
     buy_margin = m.stocks["FOO"]['bid']*3 + m.stocks["BAR"]['bid']*8 - m.stocks["CORGE"]['ask']*10
+    if sell_margin > 100:
+        m.convert_buy_order("CORGE", m.stocks['bidsize'])
+        m.sell_order("CORGE", m.stocks["CORGE"]['bid'], m.stocks["CORGE"]['bidsize']) 
     if buy_margin > 100:
         # Convert CORGE to FOO/BAR and sell at bid price
         num_corge = m.stocks["CORGE"]['position']
