@@ -11,6 +11,7 @@ PENNY_SIZE = 1
 TURNOVER = 1 #2 second turnover rate
 MAX_NUM_ORDERS = 50 #50 active orders
 FV_FUCKING_THRESHOLD = 0.3
+POS_THRESHOLD = 10
 
 def halfway_value(market, stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
@@ -47,7 +48,7 @@ def penny(market, stock, info):
     penny_buy = info['bid'] + 1
     penny_sell = info['ask'] - 1
 
-    if random.random() > 0.5:
+    if random.random() > 0.5 or market.stocks[stock]['position'] > POS_THRESHOLD:
         temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'SELL']
         current_sell_order = min(temp) if len(temp) != 0 else sys.maxint
         if current_sell_order >= info['ask']:
