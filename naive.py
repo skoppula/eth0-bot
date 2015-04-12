@@ -3,12 +3,14 @@ import market
 import statistics
 import time
 import random
+import sys
 # Last trade,  self.stocks[symbol]['last trade'] approximate pnl
 # Given a market state, output a fair value,
 
 PENNY_SIZE = 1
 TURNOVER = 1 #2 second turnover rate
-MAX_NUM_ORDERS = 20 #50 active orders
+MAX_NUM_ORDERS = 50 #50 active orders
+FV_FUCKING_THRESHOLD = 0.3
 
 def halfway_value(market, stock, info):
     # Halfway point between best bid (buy), best offer (sell) for stock
@@ -29,11 +31,11 @@ def FV_attempt(market, stock, info):
     did_action = False
     for sells in info['book_sell']:
         #sells are [price, size]
-        if sells[0] < FV:
+        if sells[0] < FV(1-FV_FUCKING_THRESHOLD):
             market.buy_order(stock, sells[0], sells[1])
             did_action = True
     for buys in info['book_buy']:
-        if buys[0] > FV:
+        if buys[0] > FV(1+FV_FUCKING_THRESHOLD):
             if info['position'] > buys[1]:
                 market.sell_order(stock, buys[0], buys[1])
                 did_action = True
@@ -44,16 +46,22 @@ def penny(market, stock, info):
         return
     penny_buy = info['bid'] + 1
     penny_sell = info['ask'] - 1
-    if market.get_moving_avg(stock) > market.stocks[stock]['last_trade']:
-        temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'SELL']
-        current_sell_order = min(temp) if len(temp) != 0 else 0
-        if current_sell_order != info['bid']:
-            market.sell_order(stock, penny_sell, PENNY_SIZE)
-    else:
-        temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'BUY']
-        current_buy_order = max(temp) if len(temp) != 0 else 0
-        if current_buy_order != info['bid']:
-            market.buy_order(stock, penny_buy, PENNY_SIZE)
+    
+    avg = market.get_moving_avg(stock)
+
+    print avg
+
+    if avg is not None:
+        if market.get_moving_avg(stock) > market.stocks[stock]['last_trade']:
+            temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'SELL']
+            current_sell_order = min(temp) if len(temp) != 0 else sys.maxint
+            if current_sell_order >= info['ask']:
+                market.sell_order(stock, penny_sell, PENNY_SIZE)
+        else:
+            temp = [values['price'] for values in market.get_orders(stock).values() if values['dir'] == 'BUY']
+            current_buy_order = max(temp) if len(temp) != 0 else 0
+            if current_buy_order <= info['bid']:
+                market.buy_order(stock, penny_buy, PENNY_SIZE)
 
 
 def ETF_strategy(m):
@@ -86,7 +94,7 @@ def next_action(m):
 
     for stock, info in sorted(m.stocks.items(), key=lambda x: random.random()):
         if m.num_orders < MAX_NUM_ORDERS:
-            did_action = FV_attempt(m, stock, info)
-            if not did_action:
-                penny(m, stock, info)
+            #did_action = FV_attempt(m, stock, info)
+            #if not did_action:
+            penny(m, stock, info)
                 #ETF_strategy(m)
